@@ -27,6 +27,7 @@ jobs:
       name: "Build the image and run unit tests"
       script:
         - echo "no-op build"
+        - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export COMPONENT_TAG_EXTENSION="-PR${TRAVIS_PULL_REQUEST}-${TRAVIS_COMMIT}"; fi;
         - make
         - make component/build
         - make component/push
@@ -35,6 +36,7 @@ jobs:
       if: type = pull_request
       script:
         - echo "no-op deploy-and-test"
+        - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export COMPONENT_TAG_EXTENSION="-PR${TRAVIS_PULL_REQUEST}-${TRAVIS_COMMIT}"; fi;
         - make
         - make component/pull
         - make component/test/unit
