@@ -13,24 +13,39 @@ services:
 env:
   global:
     - OS=linux
-    - OPERATOR_SDK_VERSION=v0.15.0
-    - COMPONENT_NAME_AND_TAG="mvp-helloworld-operator:1.0.0"
+    - COMPONENT_TYPE="helmoperator"
+    - COMPONENT_TAG_EXTENSION="-${TRAVIS_COMMIT}"
 
-before_install:
-    - curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu
-    - chmod +x operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu && sudo mkdir -p /usr/local/bin/ && sudo cp operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk && rm operator-sdk-${OPERATOR_SDK_VERSION}-x86_64-linux-gnu
+stages:
+  - build
+  - test
+  - publish
 
 jobs:
   include:
     - stage: build
       name: "Build the image and run unit tests"
       script:
-        - echo "no-op"
-    - stage: deploy-and-test
+        - echo "no-op build"
+        - make
+        - make component/build
+        - make component/push
+    - stage: test
       name: "Deploy the image to a cluster and run e2e tests"
+      if: type = pull_request
       script:
-        - ehco "no-op"
+        - echo "no-op deploy-and-test"
+        - make
+        - make component/pull
+        - make component/test/unit
+        # TODO: Checkout cluster and deploy
+        # - make component/deploy
+        - make component/test/e2e
     - stage: publish
       name: "Publish the image to quay with an official version/sha tag and publish entry to integration pipeline stage"
+      if: type = push AND branch IN ( master )
       script:
-        - echo "no-op"
+        - echo "no-op publish"
+        - make
+        # TODO: Make component manifest update not a no-op
+        - make component/manifest/update
