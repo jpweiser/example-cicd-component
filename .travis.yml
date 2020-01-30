@@ -1,11 +1,11 @@
 #
 # Sample .travis.yml using the mvp-helloworld image (a helmoperator)
 #
-dist: trusty
-group: bluezone
+dist: xenial
 os:
   - linux
 
+language: python
 python: "3.7"
 
 services:
@@ -44,8 +44,8 @@ jobs:
         - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export COMPONENT_TAG_EXTENSION="-PR${TRAVIS_PULL_REQUEST}-${TRAVIS_COMMIT}"; fi;
         # Bootstrap the build harness, pull test image, and run unit tests.  
         - | 
-          make && \
-          make component/pull && \
+          make 
+          make component/pull 
           make component/test/unit
     - stage: test-e2e
       name: "Deploy the image to a cluster and run e2e tests"
@@ -54,26 +54,25 @@ jobs:
         #Check out a clusterpool, set up oc, deploy, run e2e tests, and return clusterpool cluster
         - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export COMPONENT_TAG_EXTENSION="-PR${TRAVIS_PULL_REQUEST}-${TRAVIS_COMMIT}"; fi;
         - |
-          make && \
-          make component/pull && \
-          git clone ${CLUSTERPOOL_PROJECT_REPO} && \
-          cd clusterpool && \
-          make init && \
-          make clusterpool:init && \
-          make clusterpool:checkout && \
-          make clusterpool:get-config > ${TRAVIS_BUILD_DIR}/config.txt && \
-          cd .. && \
-          make oc/install && \
-          ${TRAVIS_BUILD_DIR}/build-harness/vendor/oc login $(cat ${TRAVIS_BUILD_DIR}/config.txt | grep ocp_api_url | awk '{ print $3 }') --insecure-skip-tls-verify=true -u $(cat ${TRAVIS_BUILD_DIR}/config.txt | grep ocp_admin_username | awk '{ print $3 }') -p $(cat ${TRAVIS_BUILD_DIR}/config.txt | grep ocp_admin_password | awk '{ print $3 }') && \
-          make component/deploy && \
-          make component/test/e2e && \
-          cd clusterpool && \
+          make 
+          make component/pull 
+          git clone ${CLUSTERPOOL_PROJECT_REPO} 
+          cd clusterpool 
+          make init 
+          make clusterpool:init 
+          make clusterpool:checkout 
+          make clusterpool:get-config > ${TRAVIS_BUILD_DIR}/config.txt 
+          cd .. 
+          make oc/install 
+          ${TRAVIS_BUILD_DIR}/build-harness/vendor/oc login $(cat ${TRAVIS_BUILD_DIR}/config.txt | grep ocp_api_url | awk '{ print $3 }') --insecure-skip-tls-verify=true -u $(cat ${TRAVIS_BUILD_DIR}/config.txt | grep ocp_admin_username | awk '{ print $3 }') -p $(cat ${TRAVIS_BUILD_DIR}/config.txt | grep ocp_admin_password | awk '{ print $3 }') 
+          make component/deploy 
+          make component/test/e2e 
+          cd clusterpool 
           make clusterpool:return
     - stage: publish
       name: "Publish the image to quay with an official version/sha tag and publish entry to integration pipeline stage"
       if: type = push AND branch IN ( master )
       script:
-        - echo "no-op publish"
-        - make
-        # TODO: Make component manifest update not a no-op
-        # - make component/manifest/update
+        - |
+          make 
+          make pipeline-manifest/update PIPELINE_MANIFEST_COMPONENT_SHA256=${TRAVIS_COMMIT} PIPELINE_MANIFEST_COMPONENT_REPO=${TRAVIS_REPO_SLUG}
