@@ -1,7 +1,6 @@
 #
 # Sample .travis.yml using the mvp-helloworld image (a helmoperator)
 #
-dist: xenial
 os:
   - linux
 
