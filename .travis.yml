@@ -12,17 +12,21 @@ services:
 
 env:
   global:
+    # Required
     - OS=linux
-    - COMPONENT_TYPE="helmoperator"
     - COMPONENT_TAG_EXTENSION="-${TRAVIS_COMMIT}"
-    - COMPONENT_DEPLOY_COMMAND=${TRAVIS_BUILD_DIR}/deploy-to-cluster.sh
     - CLUSTERPOOL_GIT_REPO=github.ibm.com/IBMPrivateCloud/clusterpool.git
     - CLUSTERPOOL_PROJECT_REPO=https://${GITHUB_USER}:${GITHUB_TOKEN}@github.ibm.com/IBMPrivateCloud/clusterpool.git
     - CLUSTERPOOL_TARGET_PLATFORM=openshift4-aws-mvp-travis
 
+    # Component Specific
+    - COMPONENT_DEPLOY_COMMAND=${TRAVIS_BUILD_DIR}/deploy-to-cluster.sh
+    - COMPONENT_TYPE="helmoperator"
+
 stages:
   - build
-  - test
+  - unit-test
+  - test-e2e
   - publish
 
 jobs:
