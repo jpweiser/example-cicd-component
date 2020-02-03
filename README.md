@@ -14,7 +14,11 @@ You'll also need to produce some artifacts that are specific to your component, 
 1. `COMPONENT_NAME` file containing the name of your component to be produced by your build.  
 2. `COMPONENT_VERSION` file containing the version of your component to be produced by your build.  
 3. `RELEASE_VERSION` file containing your components' targetted product version (for example: 1.2 for Product version 1.2).  Used in pipeline placement.  
-4. Scripts to `install-build-dependencies`, `build`, `unit-test`, `deploy`, and `e2e-test` your component.  Used in the travis job.  
+4. Within the template `.travis.yml`, scripts that you are expected to supply in the root of your component directory will be called as appropriate:
+   * `install-build-dependencies.sh` - install any build dependencies you have
+   * `build.sh` - execute any build actions
+   * `unit-test.sh` - execute unit tests
+   * `e2e-test.sh` - execute integration tests, assumptions can be made that the broader environment will be up
 
 # Travis Job Behavior
 
