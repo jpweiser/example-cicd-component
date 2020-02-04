@@ -6,7 +6,7 @@ This "HelloWorld" Helm Operator component was shamelessly copied (with permissio
 
 In order to interface your component with the pipeline, you need to include some artifacts produced by CICD in your repo:
 
-1. `Makefile` entries to bootstrap the build harness + build harness extensions
+1. `Makefile` entries to bootstrap the build harness + build harness extensions.  This line will pull [build-harness-extensions](https://github.com/open-cluster-management/build-harness-extensions) which will also pull and configure the [build-harness](https://github.com/open-cluster-management/build-harness).  
 2. `.travis.yml` template that defines the CICD provided travis job interface.  Any input required from a squad will be parameterized and noted.  
 
 You'll also need to produce some artifacts that are specific to your component, required for interface with the `component` and `pipeline` build harness module:
