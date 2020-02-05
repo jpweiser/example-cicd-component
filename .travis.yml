@@ -15,9 +15,6 @@ env:
     # Required
     - OS=linux
     - COMPONENT_TAG_EXTENSION="-${TRAVIS_COMMIT}"
-    - CLUSTERPOOL_GIT_REPO=github.ibm.com/IBMPrivateCloud/clusterpool.git
-    - CLUSTERPOOL_PROJECT_REPO=https://${GITHUB_USER}:${GITHUB_TOKEN}@github.ibm.com/IBMPrivateCloud/clusterpool.git
-    - CLUSTERPOOL_TARGET_PLATFORM=openshift4-aws-mvp-travis
 
     # Component Specific
     - COMPONENT_DEPLOY_COMMAND=${TRAVIS_BUILD_DIR}/deploy-to-cluster.sh
@@ -59,19 +56,7 @@ jobs:
         - |
           make 
           make component/pull 
-          git clone ${CLUSTERPOOL_PROJECT_REPO} 
-          cd clusterpool 
-          make init 
-          make clusterpool:init 
-          make clusterpool:checkout 
-          make clusterpool:get-config > ${TRAVIS_BUILD_DIR}/config.txt 
-          cd .. 
-          make oc/install 
-          ${TRAVIS_BUILD_DIR}/build-harness/vendor/oc login $(cat ${TRAVIS_BUILD_DIR}/config.txt | grep ocp_api_url | awk '{ print $3 }') --insecure-skip-tls-verify=true -u $(cat ${TRAVIS_BUILD_DIR}/config.txt | grep ocp_admin_username | awk '{ print $3 }') -p $(cat ${TRAVIS_BUILD_DIR}/config.txt | grep ocp_admin_password | awk '{ print $3 }') 
-          make component/deploy 
-          make component/test/e2e 
-          cd clusterpool 
-          make clusterpool:return
+          make component/test/e2e
     - stage: publish
       name: "Publish the image to quay with an official version/sha tag and publish entry to integration pipeline stage"
       if: type = push AND branch IN ( master )
