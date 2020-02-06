@@ -13,8 +13,7 @@ You'll also need to produce some artifacts that are specific to your component, 
 
 1. `COMPONENT_NAME` file containing the name of your component to be produced by your build.  
 2. `COMPONENT_VERSION` file containing the version of your component to be produced by your build.  
-3. `RELEASE_VERSION` file containing your components' targetted product version (for example: 1.2 for Product version 1.2).  Used in pipeline placement.  
-4. Within the template `.travis.yml`, scripts that you are expected to supply in the root of your component directory will be called as appropriate:
+3. Within the template `.travis.yml`, scripts that you are expected to supply in the root of your component directory will be called as appropriate:
    * `install-build-dependencies.sh` - install any build dependencies you have
    * `build.sh` - execute any build actions
    * `unit-test.sh` - execute unit tests
@@ -28,11 +27,11 @@ Using the `.travis.yml` template provided, your jobs will have the following beh
 
 PR builds will run the `build`, `unit-test`, and `test-e2e` stages.  These stages will build your component and publish a PR-tagged image to quay.io, run your unit tests, deploy your component to an OCP cluster, and run your e2e tests.  
 
-## Master/Release Versioned Branch Builds
+## Release Versioned Branch Builds
 
-Builds on master or release verisoned will run the `build` and `publish` stages.  These stages will build your component and push to quay.io with final tags (`<version>-<git-sha>`) and update the CICD pipeline repo's integration manifest to point to your new image. 
+Builds on release verisoned branches will run the `build` and `publish` stages.  These stages will build your component and push to quay.io with final tags (`<version>-<git-sha>`) and update the CICD pipeline repo's integration manifest to point to your new image. Note: the Pipeline Manifest will be updated in the git branch with a name matching your current git branch.  If there is no matching `release-<version>` branch in the pipeline repo, the publish stage will error and you should contact CICD!  
 
-## Non-Master/Release Versioned Builds
+## Non-Release Versioned Builds
 
 If a branch name is not present in the list of publish branches in your travis.yml:
 ```
@@ -121,10 +120,6 @@ In this component, the `run-e2e-tests.sh` script for this repo is defined by the
 ### COMPONENT_VERSION
 
 `COMPONENT_VERSION` file containing the version of your component to be produced by your build.  
-
-### RELEASE_VERSION
-
-`RELEASE_VERSION` file containing your components' targetted product version (for example: 1.2 for Product version 1.2).  This will be used to determine which branch to promote your component into within the CICD Pipeline.  
 
 ## Makefile
 
