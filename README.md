@@ -2,6 +2,10 @@
 
 This "HelloWorld" Helm Operator component was shamelessly copied (with permission) from Swati Nair of IBM and lays down a simple BusyBox component through a Helm chart via an operator.  This component is an example of a fully onboarded component in the new CICD pipeline including build, test, deploy, and publishing to Quay.  This README will walk you through onboarding an existing or new component onto the new CICD Pipeline.  
 
+# Access to RedHat Infrastructure
+
+If you need to access RedHat infrastructure, check out our [Onboarding Guide](https://github.com/open-cluster-management/onboarding).  
+
 # High-Level Requirements
 
 In order to interface your component with the pipeline, you need to include some artifacts produced by CICD in your repo:
