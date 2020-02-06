@@ -19,6 +19,12 @@ You'll also need to produce some artifacts that are specific to your component, 
    * `unit-test.sh` - execute unit tests
    * `e2e-test.sh` - execute integration tests, assumptions can be made that the broader environment will be up
 
+# Release Branches - Important Repository Structure Changes
+
+Your component should have a branch for each release of the product, for example this first release should have an associated branch `release-1.0.0`.  All work towards that product release should go in that branch.  
+
+The branch name will be used to match with the destination branch in [the pipeline repo](https://github.com/open-cluster-management/pipeline/tree/release-1.0.0).  If your component isn't in a release version of the pipeline repo, it won't be picked up by the pipeline!  If you have a release-versioned branch that doesn't match one in the [pipeline repo](https://github.com/open-cluster-management/pipeline/tree/release-1.0.0), your build will fail on the publish step!  
+
 # Travis Job Behavior
 
 Using the `.travis.yml` template provided, your jobs will have the following behavior:
