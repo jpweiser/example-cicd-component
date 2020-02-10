@@ -143,7 +143,7 @@ After following all of the above, ensure that your copy of the `.travis.yml` has
 
 You need to properly set the following environment variables under "Settings" for the Travis job for your component repository:
 * `DOCKER_USER` and `DOCKER_PASS`: the username and token for a robot account for the destination Quay repository.  You can learn more about creating a Robot Account [here](https://docs.quay.io/glossary/robot-accounts.html)
-* `GITHUB_USER` and `GITHUB_TOKEN`: the username and token for a GitHub user with access to your component repository, the build harness and extensions, and a clusterpool.  
+* `GITHUB_USER` and `GITHUB_TOKEN`: the username and token for a GitHub user with access to your component repository and the build harness and extensions.  Generate an OAuth token for your GitHub user according to [GitHub's official documentation on the subject](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line), giving it admin permission for repo and repo hooks, and place that token in the `GITHUB_TOKEN` variable in your travis job.  
 
 # Conclusion
 
