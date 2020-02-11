@@ -90,6 +90,7 @@ For a Go project, create a `sonar-project.properties` file at the top of the rep
     sonar.test.exclusions=**/*_generated*.go,**/*_generated/**,**/vendor/**
     sonar.go.tests.reportPaths=report.json
     sonar.go.coverage.reportPaths=coverage.out
+    sonar.externalIssuesReportPaths=gosec.json
 
 This template is in this repo as the file `sonar-project.properties.go.example`.
 
