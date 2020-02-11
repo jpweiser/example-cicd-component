@@ -10,6 +10,12 @@ python: "3.7"
 services:
   - docker
 
+addons:
+  sonarcloud:
+    organization: "open-cluster-management"
+    token:
+      secure: "VlhgSso+hJhaJP/mQVOh8pqD/hcSrkyn187G3bZXKI2uF/dNY8zV1Opy0WJRiEoGJ8AXr9N7Hx6lkVxMcpSd6DNwL2SGc0Rshy/EVcG7jnGZVDo/lsKGrC9lZEWkT9t/ZCij68P9YncWObtvrjsPn2575/qM8yAI05hjAhpPdK80g0+qzqjCGW595i0mEygvTAmcLbRHPJQZ0MAIt0WNsWkEVfBlilgDnUNT5axbnbGNWexBr6JnuRPeSIN5cF1TEyQfZvlSzwQxZLQ4/fDHGez2MwFIY3otoV2J0NVr0SKSiFNbNcJo7aVx8oIB4HtSPCUgvB6TaociCa/uX9au6pPuwSX8vCOGY0OB+1M9m4L1VGHmc9O8yI6437aOCccTxYeorUz44SImzBv0lq5XNHHqHebnDyeYXyTjTnn9Uqly5pC+2DsXCx8yIez+htizu9AMHEpaxLJtom//Lmd+gwkLZhtY45dRkKr8e4cgZIgQpKaq6YrmSPyquuYTUBzPDAaLW4xtXwTktKOBMoTTGp1Q46mrL7vHcmrtR3a8DGpc7Hc4RSSZx0O3nAiUXYaZBdAtNo6NTAYF+uN2bWMxcan8akXvJ6PSF5HdLELsEB9aZEZ7rcIdeQ2BOov/+vjI9M1WFQsp6A4KRN9+NVil5wKlv2magn5TCkKTVVLuzk4="
+
 env:
   global:
     # Required
@@ -29,7 +35,7 @@ stages:
 jobs:
   include:
     - stage: build
-      name: "Build the image and run unit tests"
+      name: "Build the test image and push it"
       script:
         - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export COMPONENT_TAG_EXTENSION="-PR${TRAVIS_PULL_REQUEST}-${TRAVIS_COMMIT}"; fi;
         - |
@@ -37,7 +43,7 @@ jobs:
           make component/build
           make component/push
     - stage: unit-test
-      name: "Deploy the image to a cluster and run e2e tests"
+      name: "Run unit tests"
       if: type = pull_request
       script:
         # Set the image tag differently for PRs
@@ -47,6 +53,7 @@ jobs:
           make 
           make component/pull 
           make component/test/unit
+          sonar-scanner --debug
     - stage: test-e2e
       name: "Deploy the image to a cluster and run e2e tests"
       if: type = pull_request

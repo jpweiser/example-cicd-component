@@ -57,6 +57,110 @@ under `branch in (<branches>)` the travis job will simply build an image tagged 
 
 First, start by copying the `.travis.yml` from this repository into your repository.  We'll update/build this this throughout the following sections.  We won't have to make too many edits, and almost all of the edits will be in the `env:` section.  
 
+## SonarCloud
+
+Ask the CICD team to onboard your project in SonarCloud. You will get three things back:
+
+- SonarCloud encrypted token
+- SonarCloud project key
+- SonarCloud project name
+
+The encrypted token will be added to the `.travis.yml` file. The project key and project name will be added to the `sonar-project.properties` file.
+
+### Update .travis.yml
+
+Add the encrypted token to the `.travis.yml` file by adding this snippet just before the `env:` section:
+
+    addons:
+      sonarcloud:
+        organization: "open-cluster-management"
+        token:
+          secure: "ENCRYPTED_TOKEN"
+
+### Go Project
+
+For a Go project, create a `sonar-project.properties` file at the top of the repo using this template:
+
+    sonar.projectKey=PROJECT_KEY
+    sonar.projectName=PROJECT_NAME
+    sonar.sources=.
+    sonar.exclusions=**/*_test.go,**/*_generated*.go,**/*_generated/**,**/vendor/**
+    sonar.tests=.
+    sonar.test.inclusions=**/*_test.go
+    sonar.test.exclusions=**/*_generated*.go,**/*_generated/**,**/vendor/**
+    sonar.go.tests.reportPaths=report.json
+    sonar.go.coverage.reportPaths=coverage.out
+
+This template is in this repo as the file `sonar-project.properties.go.example`.
+
+Next, in the `.travis.yml` add this line to the end of the script in the `unit-test` stage:
+
+    make sonar/go
+
+The stage should look something like this:
+
+    - stage: unit-test
+      name: "Run unit tests"
+      if: type = pull_request
+      script:
+        # Set the image tag differently for PRs
+        - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export COMPONENT_TAG_EXTENSION="-PR${TRAVIS_PULL_REQUEST}-${TRAVIS_COMMIT}"; fi;
+        # Bootstrap the build harness, pull test image, and run unit tests.
+        - |
+          make
+          make component/pull
+          make component/test/unit
+          make sonar/go
+
+Note that this repo is a python project and so its unit-test stage has the `sonar-scanner --debug` line as the last statement in the script. Be sure to remove this line for a Go project as it's part of the make sonar/go recipe.
+
+### Node Project
+
+Coming Soon...
+
+### Other Projects
+
+For a project that is not Go or Node based, create a `sonar-project.properties` file at the top of the repo using this template:
+
+    sonar.projectKey=PROJECT_KEY
+    sonar.projectName=PROJECT_NAME
+
+Note that this project will not have code coverage or unit test results. Those reports will need to be configured on a case by case basis. Contact the CICD team for help implementing these reports for other languages.
+
+Next, in the `.travis.yml` add this line to the end of the script in the `unit-test` stage:
+
+    sonar-scanner --debug
+
+The stage should look something like this:
+
+    - stage: unit-test
+      name: "Run unit tests"
+      if: type = pull_request
+      script:
+        # Set the image tag differently for PRs
+        - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export COMPONENT_TAG_EXTENSION="-PR${TRAVIS_PULL_REQUEST}-${TRAVIS_COMMIT}"; fi;
+        # Bootstrap the build harness, pull test image, and run unit tests.
+        - |
+          make
+          make component/pull
+          make component/test/unit
+          sonar-scanner --debug
+
+
+### CICD onboarding process
+
+To onboard a new repo to SonarCloud:
+
+- Go to https://sonarcloud.io/organizations/open-cluster-management/projects
+- Find the project in the list and click "Configure Analysis"
+- Click the "With Travis CI" link
+- Copy the `travis encrypt a1b2c3d4` command shown and run it to generate an encrypted token. Save this token.
+- Click the "Continue" link.
+- Under "What is your build technology?" click "Other".
+- Click "Continue"
+- In the sample `sonar-project.properties` file shown, copy the values for `sonar.projectKey` and `sonar.projectName`
+- Send the encrypted token, project key, and project name back to the requester.
+
 ## Component Specific Scripting
 
 You'll need to identify which scripts you need to implement out of the following list one-by-one.  CICD is working to provide generalized scripts to accomodate some common components types for component build and deploy, but we won't capture all of the possibilities.  
